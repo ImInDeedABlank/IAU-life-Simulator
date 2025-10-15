@@ -2,6 +2,8 @@
 -- main.lua
 -- IAU Life Simulator with GUI kit (paused-time, week-long, final exam)
 local ui = require("src.ui")
+local map = require("src.map")
+local assets = require("src.assets")
 
 -- =========[ CONFIG ]=========
 local DAY_START   = 6 * 60          -- 06:00
@@ -12,9 +14,10 @@ local EXAM_TARGET = 220
 
 -- =========[ STATE ]=========
 local game = {
-  state = "tutorial",               -- tutorial | playing | result
+  state = "tutorial",               -- tutorial | playing | map | result
   day = 1,
   dayMinutesLeft = DAY_MINUTES,
+  viewMode = "map",                 -- map | stats (toggle between views)
 }
 
 local player = {
@@ -160,6 +163,9 @@ function love.load()
   love.window.setTitle("IAU Life Simulator - GUI Prototype")
   love.window.setMode(1000, 640, {resizable=true, minwidth=900, minheight=560})
   love.graphics.setBackgroundColor(ui.theme.colors.bg)
+  
+  -- Load map and assets
+  map.load()
 end
 
 function love.update(dt)
@@ -169,6 +175,12 @@ function love.update(dt)
   local currentPressed = love.mouse.isDown(1)
   mouse.justPressed = currentPressed and not mouse.wasPressed
   mouse.wasPressed = currentPressed
+  
+  -- Update map hover state
+  if game.state == "playing" and game.viewMode == "map" then
+    local mx, my = love.mouse.getX(), love.mouse.getY()
+    map.update(mx, my)
+  end
 end
 
 function love.draw()
@@ -232,6 +244,16 @@ function love.draw()
   love.graphics.setFont(ui.theme.font)
   love.graphics.print("Day "..tostring(game.day).." / "..WEEK_DAYS, 32, 32)
 
+  -- Toggle View button (Map/Stats)
+  local toggleX = 200
+  local toggleY = 24
+  local toggleIcon = game.viewMode == "map" and "📊" or "🗺️"
+  local toggleText = game.viewMode == "map" and "Stats" or "Map"
+  local hoveredToggle = ui.iconButton(toggleIcon, toggleText, toggleX, toggleY, 140, 40)
+  if hoveredToggle and mouse.justPressed then
+    game.viewMode = game.viewMode == "map" and "stats" or "map"
+  end
+
   -- End Day button
   local endX = w - 160 - 24
   local endY = 24
@@ -240,47 +262,87 @@ function love.draw()
     nextDayOrExam()
   end
 
-  -- Left: Clock
-  local spentFrac = (DAY_MINUTES - game.dayMinutesLeft) / DAY_MINUTES
-  ui.panel(16, 86, 220, 220, "Clock")
-  ui.clock(126, 196, 70, spentFrac, "06:00", "24:00")
-  local now = currentDayMinutes()
-  love.graphics.setColor(ui.theme.colors.text)
-  love.graphics.printf("Time: "..minutesToHHMM(now), 16, 260, 220, "center")
-  love.graphics.printf("Left: "..tostring(game.dayMinutesLeft).."m", 16, 280, 220, "center")
-
-  -- Middle: Stats
-  ui.panel(250, 86, w-250-16, 160, "Stats")
-  local sx = 270
-  ui.statBar(sx, 130, w-250-56, "Knowledge", player.knowledge, 400, ui.theme.colors.text)
-  ui.statBar(sx, 158, w-250-56, "Energy",    player.energy,    100, ui.theme.colors.text)
-  ui.statBar(sx, 186, w-250-56, "Social",    player.social,    100, ui.theme.colors.text)
-  ui.statBar(sx, 214, w-250-56, "Stress",    player.stress,    100, ui.theme.colors.text)
-  ui.statBar(sx, 242, w-250-56, "Money",     player.money,     999, ui.theme.colors.text)
-
-  -- Bottom: Actions
-  local pad = 14
-  local btnW = math.floor((w - 32 - pad*3) / 4)
-  local btnY = h - 86
-  local bx = 16
-  ui.panel(16, btnY-64, w-32, 120, "Actions")
-  for i, a in ipairs(actions) do
-    local hovered = ui.iconButton(a.icon, a.name .. "  ("..a.minutes.."m)", bx, btnY, btnW, 56)
-    if hovered then
-      ui.showTooltip(a.tip, love.mouse.getX(), love.mouse.getY())
-      if mouse.justPressed then performAction(i) end
+  -- MAP VIEW
+  if game.viewMode == "map" then
+    -- Draw the map with clickable buildings
+    map.draw()
+    
+    -- Check for building clicks
+    if mouse.justPressed and map.hoveredBuilding then
+      -- Find the action index by name
+      local actionName = map.hoveredBuilding.action
+      for i, a in ipairs(actions) do
+        if a.name == actionName then
+          performAction(i)
+          break
+        end
+      end
     end
-    bx = bx + btnW + pad
+    
+    -- Draw mini stats overlay on map
+    ui.panel(16, 86, 220, 200, "Quick Stats")
+    local sx = 26
+    love.graphics.setColor(ui.theme.colors.text)
+    love.graphics.setFont(ui.theme.fontSmall)
+    love.graphics.print("Knowledge: " .. player.knowledge, sx, 115)
+    love.graphics.print("Energy: " .. player.energy, sx, 135)
+    love.graphics.print("Social: " .. player.social, sx, 155)
+    love.graphics.print("Stress: " .. player.stress, sx, 175)
+    love.graphics.print("Money: $" .. player.money, sx, 195)
+    
+    -- Time display
+    ui.panel(16, h-100, 220, 80, "Time")
+    local now = currentDayMinutes()
+    love.graphics.setColor(ui.theme.colors.text)
+    love.graphics.setFont(ui.theme.font)
+    love.graphics.printf(minutesToHHMM(now), 16, h-70, 220, "center")
+    love.graphics.setFont(ui.theme.fontSmall)
+    love.graphics.printf(tostring(game.dayMinutesLeft).." min left", 16, h-45, 220, "center")
+    
+  -- STATS VIEW (Original)
+  else
+    -- Left: Clock
+    local spentFrac = (DAY_MINUTES - game.dayMinutesLeft) / DAY_MINUTES
+    ui.panel(16, 86, 220, 220, "Clock")
+    ui.clock(126, 196, 70, spentFrac, "06:00", "24:00")
+    local now = currentDayMinutes()
+    love.graphics.setColor(ui.theme.colors.text)
+    love.graphics.printf("Time: "..minutesToHHMM(now), 16, 260, 220, "center")
+    love.graphics.printf("Left: "..tostring(game.dayMinutesLeft).."m", 16, 280, 220, "center")
+
+    -- Middle: Stats
+    ui.panel(250, 86, w-250-16, 160, "Stats")
+    local sx = 270
+    ui.statBar(sx, 130, w-250-56, "Knowledge", player.knowledge, 400, ui.theme.colors.text)
+    ui.statBar(sx, 158, w-250-56, "Energy",    player.energy,    100, ui.theme.colors.text)
+    ui.statBar(sx, 186, w-250-56, "Social",    player.social,    100, ui.theme.colors.text)
+    ui.statBar(sx, 214, w-250-56, "Stress",    player.stress,    100, ui.theme.colors.text)
+    ui.statBar(sx, 242, w-250-56, "Money",     player.money,     999, ui.theme.colors.text)
+
+    -- Bottom: Actions
+    local pad = 14
+    local btnW = math.floor((w - 32 - pad*3) / 4)
+    local btnY = h - 86
+    local bx = 16
+    ui.panel(16, btnY-64, w-32, 120, "Actions")
+    for i, a in ipairs(actions) do
+      local hovered = ui.iconButton(a.icon, a.name .. "  ("..a.minutes.."m)", bx, btnY, btnW, 56)
+      if hovered then
+        ui.showTooltip(a.tip, love.mouse.getX(), love.mouse.getY())
+        if mouse.justPressed then performAction(i) end
+      end
+      bx = bx + btnW + pad
+    end
+
+    -- Day progress bar
+    local progX, progY, progW = 16, btnY-12, w-32
+    ui.progressBar(progX, progY, progW, 10, spentFrac, "Day Progress")
+
+    -- Footer: Exam target
+    love.graphics.setColor(ui.theme.colors.muted)
+    love.graphics.printf("Final Exam target ≈ "..EXAM_TARGET.." knowledge (Energy/Stress modify score).",
+      16, h-22, w-32, "center")
   end
-
-  -- Day progress bar
-  local progX, progY, progW = 16, btnY-12, w-32
-  ui.progressBar(progX, progY, progW, 10, spentFrac, "Day Progress")
-
-  -- Footer: Exam target
-  love.graphics.setColor(ui.theme.colors.muted)
-  love.graphics.printf("Final Exam target ≈ "..EXAM_TARGET.." knowledge (Energy/Stress modify score).",
-    16, h-22, w-32, "center")
 
   -- Draw overlays
   ui.drawToasts()
@@ -293,11 +355,16 @@ function love.keypressed(key)
     if key == "space" then startWeek() end
     return
   end
-  if key == "1" then performAction(1)
-  elseif key == "2" then performAction(2)
-  elseif key == "3" then performAction(3)
-  elseif key == "4" then performAction(4)
-  elseif key == "e" then nextDayOrExam()
+  if game.state == "playing" then
+    if key == "1" then performAction(1)
+    elseif key == "2" then performAction(2)
+    elseif key == "3" then performAction(3)
+    elseif key == "4" then performAction(4)
+    elseif key == "e" then nextDayOrExam()
+    elseif key == "tab" or key == "m" then
+      -- Toggle between map and stats view
+      game.viewMode = game.viewMode == "map" and "stats" or "map"
+    end
   elseif key == "r" and game.state == "result" then
     game.state = "tutorial"
   end
