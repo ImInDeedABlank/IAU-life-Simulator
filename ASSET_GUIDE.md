@@ -1,7 +1,7 @@
 # Asset Implementation Guide
 
 ## Overview
-You have Kenney asset packs with 1036 individual tile images. For a clicking-style game, we're using a **sprite-based building system** rather than a full tile map.
+We have Kenney asset packs with 1036 individual tile images. For a clicking-style game, we're using a **sprite-based building system** rather than a full tile map.
 
 ## Why Not Use Tiled?
 
