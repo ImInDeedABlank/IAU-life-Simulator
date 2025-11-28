@@ -1,0 +1,2 @@
+# Exclude asset directories from GitHub language statistics
+assets/** linguist-vendored
