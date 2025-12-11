@@ -3,7 +3,7 @@
 ## What's Implemented
 
 ### Two View Modes
-1. **Map View** (NEW!) - Click on buildings to perform actions
+1. **Map View** Click on buildings to perform actions
 2. **Stats View** - Original button-based interface
 
 ### Map System
