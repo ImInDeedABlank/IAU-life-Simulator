@@ -19,11 +19,11 @@ map.camera = {
 -- Load building sprites and define positions
 function map.load()
   -- Load a simple background (or create one programmatically)
-  -- You can use one of the tilemap images as background
+  -- We can use one of the tilemap images as background
   -- map.background = love.graphics.newImage("assets/kenney_roguelike-modern-city/Tilemap/tilemap_packed.png")
   
   -- Define buildings with their positions and properties
-  -- Each building links to one of your game actions
+  -- Each building links to one of the game actions
   map.buildings = {
     {
       name = "Library",
@@ -71,7 +71,7 @@ function map.load()
     },
   }
   
-  -- Optional: Load actual sprites from your assets
+  -- Optional (for later): Load actual sprites from assets
   -- Example: map.buildings[1].sprite = love.graphics.newImage("assets/path/to/building.png")
 end
 

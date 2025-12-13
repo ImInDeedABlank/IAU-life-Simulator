@@ -15,7 +15,7 @@ We have Kenney asset packs with 1036 individual tile images. For a clicking-styl
 ### Simple Sprite Approach ✅
 - Direct control over building placement
 - Easy click detection with rectangles
-- Better performance for your game type
+- Better performance for our game type
 - Quick to prototype and modify
 - Perfect for point-and-click gameplay
 
@@ -42,7 +42,7 @@ assets/
 
 ## Finding the Right Tiles
 
-### Step 1: Browse Your Tiles
+### Step 1: Browse Our Tiles
 Look through `assets/kenney_roguelike-modern-city/Tiles/` to find:
 - **tile_0XXX.png** - School/University building
 - **tile_0XXX.png** - Residential/Dorm building  
@@ -55,8 +55,8 @@ Look through `assets/kenney_roguelike-modern-city/Tiles/` to find:
 Edit `src/assets.lua` line 11-17:
 ```lua
 assets.buildingTiles = {
-  library = "tile_0425",    -- Replace with your chosen tile number
-  dorm = "tile_0532",       -- Replace with your chosen tile number
+  library = "tile_0425",    -- Replace with our chosen tile number
+  dorm = "tile_0532",       -- Replace with our chosen tile number
   office = "tile_0789",     -- etc...
   cafe = "tile_0156",
   gym = "tile_0892",
@@ -103,14 +103,3 @@ building.tiles = {
   {tileNum3, tileNum4}
 }
 ```
-
-## Performance Notes
-- Current approach: ~4-8 buildings = Very fast
-- With sprites: Still very fast (pre-loaded images)
-- Tiled approach: Slower (renders hundreds of tiles)
-
-## Next Steps
-1. Run the game to see the basic map
-2. Browse your tiles and pick favorites
-3. Update the tile mappings
-4. Gradually replace colored blocks with sprites

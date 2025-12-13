@@ -23,15 +23,15 @@
 
 ### Customizing Buildings
 
-#### Step 1: Find Your Tiles
-Browse `assets/kenney_roguelike-modern-city/Tiles/` folder and note the numbers of tiles you like.
+#### Step 1: Find Tiles
+Browse `assets/kenney_roguelike-modern-city/Tiles/` folder and note the numbers of tiles.
 
 #### Step 2: Update Asset Mappings
 Edit `src/assets.lua`:
 ```lua
 assets.buildingTiles = {
-  library = "tile_0100",  -- Change to your chosen tile
-  dorm = "tile_0200",     -- Change to your chosen tile
+  library = "tile_0100", 
+  dorm = "tile_0200",    
   -- etc...
 }
 ```
@@ -39,7 +39,6 @@ assets.buildingTiles = {
 #### Step 3: Enable Sprite Loading
 Edit `src/map.lua`, find the `map.load()` function and uncomment these lines:
 ```lua
--- Load actual sprites from your assets
 -- Example: building.sprite = assets.loadTileByName("library")
 ```
 
@@ -108,7 +107,7 @@ src/
   map.lua         - Map rendering & building system
   assets.lua      - Asset loading utilities
 assets/
-  kenney_*/       - Your Kenney asset packs
+  kenney_*/      
 ```
 
 ## Why This Approach?
@@ -117,7 +116,7 @@ assets/
 - **Simple** - No external tools needed
 - **Fast** - Quick to prototype and test
 - **Flexible** - Easy to move buildings around
-- **Performant** - Renders only what you need
+- **Performant** - Renders only what we need
 - **Clickable** - Perfect for point-and-click gameplay
 
 ### ❌ Tiled Map Would Be
@@ -130,11 +129,11 @@ assets/
 ## Next Steps
 
 1. ✅ Test the current implementation
-2. 🔍 Browse your tiles to pick favorites
+2. 🔍 Browse our tiles to pick
 3. 🎨 Update asset mappings
 4. 🖼️ Enable sprite rendering
 5. ✨ Add more buildings/actions
-6. 🎵 Add sound effects (you have UI sounds!)
+6. 🎵 Add sound effects
 
 ## Troubleshooting
 
@@ -148,13 +147,13 @@ assets/
 - Console will show "Warning: Could not load tile" messages
 
 **Click not working?**
-- Make sure you're in "playing" state
+- Make sure we're in "playing" state
 - Check that viewMode is "map"
 - Buildings need correct x, y, width, height
 
 ## Sound Effects
 
-You also have sound packs! To add them:
+sound packs:
 ```lua
 -- In love.load()
 local clickSound = love.audio.newSource("assets/kenney_ui-audio/click1.ogg", "static")

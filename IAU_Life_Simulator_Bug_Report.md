@@ -107,17 +107,3 @@ The map module defines a `camera` table (with `x`, `y`, and `zoom`) but mouse hi
 **Proposed Fixes**  
 - When the camera feature is implemented, apply the inverse camera transform to mouse coordinates before hit-testing buildings.  
 - Or, apply camera transforms to all drawing and keep hitboxes in world space so everything stays consistent.
-
----
-
-## 8. Minor UX Polish Ideas (Optional)
-
-These are not strict “bugs” but could smooth things out:
-
-- Add a small **“Help” / “Controls”** tooltip or icon on the main UI bar explaining keys: `1–4` actions, `E` end day, `TAB/M` toggle Map/Stats.  
-- Show a short summary when a new day starts (what recovered, what changed).  
-- In the result screen, show which day/time the exam was reached to give players more feedback about pacing.
-
----
-
-If you want, this file can be dropped directly into your repo as `BUGS.md` or `KNOWN_ISSUES.md` and updated as you iterate on the game.

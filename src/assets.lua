@@ -7,8 +7,8 @@ local assets = {}
 -- Cache loaded images
 assets.cache = {}
 
--- Kenney Modern City tile indices (you'll need to find these by looking at the tiles)
--- These are example mappings - you'll need to find the actual tile numbers for your buildings
+-- Kenney Modern City tile indices (we'll need to find these by looking at the tiles)
+-- These are example mappings - we'll need to find the actual tile numbers for the buildings
 assets.buildingTiles = {
   library = "tile_0100",      -- Replace with actual tile number for library/school
   dorm = "tile_0200",          -- Replace with actual tile number for residential
